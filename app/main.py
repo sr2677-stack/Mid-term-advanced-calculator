@@ -1,9 +1,12 @@
 # app/main.py
 
+from colorama import init, Fore, Style
 from app.calculator import Calculator, LoggingObserver, AutoSaveObserver
 from app.input_validators import validate_number
 from app.exceptions import CalculatorError
 from app.operations import OperationFactory
+
+init(autoreset=True)
 
 
 def print_help():
@@ -11,31 +14,26 @@ def print_help():
     Dynamically generate help menu based on available operations.
     This ensures new operations automatically appear in help.
     """
-    print("\nAvailable Operations:")
+    print(Fore.CYAN + "\nAvailable Operations:")
     for op in OperationFactory.get_available_operations():
-        print(f"  {op} <a> <b>")
+        print(Fore.YELLOW + f"  {op} <a> <b>")
 
-    print("\nOther Commands:")
-    print("  history")
-    print("  clear")
-    print("  undo")
-    print("  redo")
-    print("  save")
-    print("  load")
-    print("  help")
-    print("  exit\n")
+    print(Fore.CYAN + "\nOther Commands:")
+    for cmd in ["history", "clear", "undo", "redo", "save", "load", "help", "exit"]:
+        print(Fore.YELLOW + f"  {cmd}")
+    print()
 
 
 def display_history(calculator: Calculator):
     history = calculator.get_history()
 
     if not history:
-        print("No history available.")
+        print(Fore.YELLOW + "No history available.")
         return
 
-    print("\nCalculation History:")
+    print(Fore.CYAN + "\nCalculation History:")
     for calc in history:
-        print(f"  {calc.operation} {calc.a} {calc.b} = {calc.result}")
+        print(Fore.WHITE + f"  {calc.operation} {calc.a} {calc.b} = " + Fore.GREEN + f"{calc.result}")
     print()
 
 
@@ -46,12 +44,12 @@ def repl():
     calculator.register_observer(LoggingObserver())
     calculator.register_observer(AutoSaveObserver())
 
-    print("\nAdvanced Calculator")
-    print("Type 'help' to see available commands.\n")
+    print(Fore.CYAN + Style.BRIGHT + "\nAdvanced Calculator")
+    print(Fore.WHITE + "Type 'help' to see available commands.\n")
 
     while True:
         try:
-            user_input = input(">>> ").strip()
+            user_input = input(Fore.WHITE + ">>> ").strip()
 
             if not user_input:
                 continue
@@ -59,67 +57,58 @@ def repl():
             parts = user_input.split()
             command = parts[0].lower()
 
-            # Exit
             if command == "exit":
-                print("Exiting calculator.")
+                print(Fore.CYAN + "Exiting calculator.")
                 break
 
-            # Help
             if command == "help":
                 print_help()
                 continue
 
-            # History
             if command == "history":
                 display_history(calculator)
                 continue
 
-            # Clear
             if command == "clear":
                 calculator.clear_history()
-                print("History cleared.\n")
+                print(Fore.YELLOW + "History cleared.\n")
                 continue
 
-            # Undo
             if command == "undo":
                 calculator.undo()
-                print("Undo successful.\n")
+                print(Fore.YELLOW + "Undo successful.\n")
                 continue
 
-            # Redo
             if command == "redo":
                 calculator.redo()
-                print("Redo successful.\n")
+                print(Fore.YELLOW + "Redo successful.\n")
                 continue
 
-            # Save
             if command == "save":
                 calculator.save_history()
-                print("History saved.\n")
+                print(Fore.YELLOW + "History saved.\n")
                 continue
 
-            # Load
             if command == "load":
                 calculator.load_history()
-                print("History loaded.\n")
+                print(Fore.YELLOW + "History loaded.\n")
                 continue
 
-            # Arithmetic operations
             if len(parts) != 3:
-                print("Invalid format. Use: operation a b\n")
+                print(Fore.RED + "Invalid format. Use: operation a b\n")
                 continue
 
             a = validate_number(parts[1])
             b = validate_number(parts[2])
 
             result = calculator.calculate(command, a, b)
-            print(f"Result: {result}\n")
+            print(Fore.GREEN + f"Result: {result}\n")
 
         except CalculatorError as e:
-            print(f"Error: {e}\n")
+            print(Fore.RED + f"Error: {e}\n")
 
         except Exception as e:
-            print(f"Unexpected error: {e}\n")
+            print(Fore.RED + f"Unexpected error: {e}\n")
 
 
 if __name__ == "__main__":  # pragma: no cover
