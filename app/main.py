@@ -1,4 +1,3 @@
-# pragma: no cover
 # app/main.py
 
 from app.calculator import Calculator, LoggingObserver, AutoSaveObserver
