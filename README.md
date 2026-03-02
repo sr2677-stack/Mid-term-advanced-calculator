@@ -146,14 +146,14 @@ add 2.0 3.0 = 5.0
 power 2.0 5.0 = 32.0
 Testing Instructions
 
-▶️ Running the Application
-
-From the project root:
-python -m app.main
-
 🧪 Running Tests
 pytest
 Run tests with coverage report:
 pytest --cov=app
 Enforce minimum coverage threshold (90%):
 pytest --cov=app --cov-fail-under=90
+
+▶️ Running the Application
+
+From the project root:
+python -m app.main
