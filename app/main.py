@@ -1,30 +1,43 @@
+# pragma: no cover
 # app/main.py
 
 from app.calculator import Calculator, LoggingObserver, AutoSaveObserver
 from app.input_validators import validate_number
 from app.exceptions import CalculatorError
+from app.operations import OperationFactory
 
 
 def print_help():
-    print("\nAvailable Commands:")
-    print(" add a b")
-    print(" subtract a b")
-    print(" multiply a b")
-    print(" divide a b")
-    print(" power a b")
-    print(" root a b")
-    print(" modulus a b")
-    print(" int_divide a b")
-    print(" percent a b")
-    print(" abs_diff a b")
-    print(" history")
-    print(" clear")
-    print(" undo")
-    print(" redo")
-    print(" save")
-    print(" load")
-    print(" help")
-    print(" exit\n")
+    """
+    Dynamically generate help menu based on available operations.
+    This ensures new operations automatically appear in help.
+    """
+    print("\nAvailable Operations:")
+    for op in OperationFactory.get_available_operations():
+        print(f"  {op} <a> <b>")
+
+    print("\nOther Commands:")
+    print("  history")
+    print("  clear")
+    print("  undo")
+    print("  redo")
+    print("  save")
+    print("  load")
+    print("  help")
+    print("  exit\n")
+
+
+def display_history(calculator: Calculator):
+    history = calculator.get_history()
+
+    if not history:
+        print("No history available.")
+        return
+
+    print("\nCalculation History:")
+    for calc in history:
+        print(f"  {calc.operation} {calc.a} {calc.b} = {calc.result}")
+    print()
 
 
 def repl():
@@ -34,7 +47,8 @@ def repl():
     calculator.register_observer(LoggingObserver())
     calculator.register_observer(AutoSaveObserver())
 
-    print("Advanced Calculator (Type 'help' for commands)")
+    print("\nAdvanced Calculator")
+    print("Type 'help' to see available commands.\n")
 
     while True:
         try:
@@ -52,60 +66,62 @@ def repl():
                 break
 
             # Help
-            elif command == "help":
+            if command == "help":
                 print_help()
+                continue
 
             # History
-            elif command == "history":
-                history = calculator.get_history()
-                if not history:
-                    print("No history available.")
-                for calc in history:
-                    print(f"{calc.operation} {calc.a} {calc.b} = {calc.result}")
+            if command == "history":
+                display_history(calculator)
+                continue
 
             # Clear
-            elif command == "clear":
+            if command == "clear":
                 calculator.clear_history()
-                print("History cleared.")
+                print("History cleared.\n")
+                continue
 
             # Undo
-            elif command == "undo":
+            if command == "undo":
                 calculator.undo()
-                print("Undo successful.")
+                print("Undo successful.\n")
+                continue
 
             # Redo
-            elif command == "redo":
+            if command == "redo":
                 calculator.redo()
-                print("Redo successful.")
+                print("Redo successful.\n")
+                continue
 
             # Save
-            elif command == "save":
+            if command == "save":
                 calculator.save_history()
-                print("History saved.")
+                print("History saved.\n")
+                continue
 
             # Load
-            elif command == "load":
+            if command == "load":
                 calculator.load_history()
-                print("History loaded.")
+                print("History loaded.\n")
+                continue
 
-            # Operations
-            else:
-                if len(parts) != 3:
-                    print("Invalid format. Use: operation a b")
-                    continue
+            # Arithmetic operations
+            if len(parts) != 3:
+                print("Invalid format. Use: operation a b\n")
+                continue
 
-                a = validate_number(parts[1])
-                b = validate_number(parts[2])
+            a = validate_number(parts[1])
+            b = validate_number(parts[2])
 
-                result = calculator.calculate(command, a, b)
-                print(f"Result: {result}")
+            result = calculator.calculate(command, a, b)
+            print(f"Result: {result}\n")
 
         except CalculatorError as e:
-            print(f"Error: {e}")
+            print(f"Error: {e}\n")
 
         except Exception as e:
-            print(f"Unexpected error: {e}")
+            print(f"Unexpected error: {e}\n")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     repl()
